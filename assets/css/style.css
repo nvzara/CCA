@@ -516,54 +516,41 @@ body.in-exam .tabs, body.in-exam .topline { display: none; }
 /* ── 자격증: 카드형 ── */
 .lic-stage { margin: 16px 0; }
 .card-pair { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; }
-.lic-card {
-  position: relative; width: 100%; max-width: 430px; aspect-ratio: 85.6 / 54; overflow: hidden;
-  background: var(--lbg); border: 3px solid var(--ink); border-radius: 22px; box-shadow: 5px 5px 0 var(--ink);
-  padding: 12px 16px; display: flex; flex-direction: column; container-type: inline-size;
+.lic-card { position: relative; width: 100%; max-width: 440px; aspect-ratio: 340 / 236; }
+.lic-card.front .lic-svg { width: 100%; height: 100%; display: block; filter: drop-shadow(3px 4px 0 rgba(38, 38, 38, .18)); }
+.lic-card.back {
+  background: var(--lfill); border: 3.4px solid #262626; border-radius: 30px; padding: 10px;
+  box-shadow: 3px 4px 0 rgba(38, 38, 38, .18); container-type: inline-size; color: #262626;
 }
-.lc-dots { position: absolute; inset: 0; opacity: .7; pointer-events: none; }
-.lic-card > *:not(.lc-dots) { position: relative; }
-.lc-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid var(--ink); padding-bottom: 4px; }
-.lc-logo { font-family: var(--font-hand); font-weight: 700; font-size: clamp(14px, 4.4cqw, 20px); background: #fff; border: 2px solid var(--ink); border-radius: 999px; padding: 0 10px; }
-.lc-kind { font-family: var(--font-hand); font-weight: 700; font-size: clamp(16px, 5.6cqw, 26px); letter-spacing: .25em; }
-.lc-body { display: flex; gap: 12px; margin-top: 8px; flex: 1; min-height: 0; }
-.lc-photo { flex: none; width: 27%; background: #fff; border: 2.5px solid var(--ink); border-radius: 12px; padding: 4px; display: flex; align-items: flex-end; }
-.lc-info { flex: 1; min-width: 0; font-size: clamp(11px, 3.1cqw, 14px); }
-.lc-cert { display: flex; align-items: center; gap: 4px; font-size: clamp(14px, 4.4cqw, 19px); flex-wrap: wrap; }
-.lc-cert .deco { width: 1.4em; height: 1.4em; }
-.lc-cert b { font-family: var(--font-hand); }
-.lc-grade { background: var(--lband); border: 2px solid var(--ink); border-radius: 999px; padding: 0 8px; font-weight: 700; font-size: .85em; }
-.lc-info dl { display: grid; grid-template-columns: auto 1fr; gap: 0 8px; margin: 4px 0 0; }
-.lc-info dt { color: var(--ink-soft); }
-.lc-info dd { margin: 0; font-weight: 700; }
-.lc-foot { display: flex; justify-content: space-between; align-items: flex-end; font-size: clamp(10px, 2.8cqw, 13px); }
-.lc-foot .pattern { width: 12%; min-width: 34px; background: #fff; border: 2px solid var(--ink); border-radius: 6px; padding: 2px; }
-.lc-seal { position: absolute !important; right: 22%; bottom: 10%; width: 19%; opacity: .85; transform: rotate(-10deg); }
+.lb-in {
+  position: relative; height: 100%; border: 2.6px solid #262626; border-radius: 18px; background: rgba(255, 255, 255, .55);
+  padding: 4% 5%; display: flex; flex-direction: column;
+}
+.lb-title { font-family: var(--font-hand); font-weight: 700; font-size: clamp(16px, 6cqw, 26px); border-bottom: 2.4px solid #262626; line-height: 1.2; padding-bottom: 2px; }
+.lb-info { display: grid; grid-template-columns: auto 1fr; gap: 0 10px; margin: 6px 0 0; font-size: clamp(10px, 3.3cqw, 14px); line-height: 1.5; }
+.lb-info dt { opacity: .65; }
+.lb-info dd { margin: 0; font-weight: 700; }
+.lb-notes { margin: 4px 0 0; padding-left: 16px; font-size: clamp(9px, 2.8cqw, 12px); flex: 1; }
+.lb-foot { display: flex; justify-content: space-between; align-items: flex-end; font-family: var(--font-hand); font-weight: 700; font-size: clamp(12px, 3.8cqw, 16px); }
+.lb-foot .pattern { width: 13%; min-width: 30px; background: #fff; border: 2px solid #262626; border-radius: 6px; padding: 2px; }
+.lb-seal { position: absolute; right: 20%; bottom: 6%; width: 17%; opacity: .85; transform: rotate(-10deg); }
 .seal { width: 100%; height: auto; display: block; }
 .lc-void {
-  position: absolute !important; inset: 0; display: grid; place-items: center; font-family: var(--font-hand); font-size: 40px; font-weight: 700;
-  color: var(--red); background: rgba(255, 255, 255, .55); transform: rotate(-14deg);
+  position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--font-hand); font-size: 40px; font-weight: 700;
+  color: var(--red); background: rgba(255, 255, 255, .55); border-radius: 30px; transform: rotate(-8deg);
 }
 .lc-void.big { font-size: 80px; }
-.lc-notes { margin: 8px 0; padding-left: 18px; font-size: clamp(11px, 3cqw, 14px); flex: 1; }
-.lc-notes li::marker { content: '✿ '; color: var(--pink-deep); }
-.lc-back-foot { font-size: clamp(9px, 2.5cqw, 12px); color: var(--ink-soft); border-top: 1.5px dashed var(--ink); padding-top: 4px; }
-.lc-back-deco { position: absolute !important; right: 14px; bottom: 34px; display: flex; gap: 2px; opacity: .9; }
-.lc-back-deco .deco { width: 26px; height: 26px; }
 
 /* ── 자격증: 증서형 ── */
-.lic-paper { max-width: 620px; margin: 0 auto; background: var(--lbg); border: 3px solid var(--ink); border-radius: 26px; padding: 16px; box-shadow: 6px 6px 0 var(--ink); }
+.lic-paper { max-width: 620px; margin: 0 auto; background: var(--lband); border: 3.4px solid #262626; border-radius: 26px; padding: 16px; box-shadow: 6px 6px 0 var(--ink); }
 .lp-frame {
-  position: relative; background: #FFFEF8; border: 3px dashed var(--ink); border-radius: 18px; padding: 30px 30px 22px; text-align: center;
-  outline: 8px solid var(--lband); outline-offset: -14px;
+  position: relative; background: #FFFEF8; border: 2.6px solid #262626; border-radius: 18px; padding: 30px 30px 22px; text-align: center;
 }
-.lp-corner { position: absolute; width: 46px; height: 46px; }
-.lp-corner .deco { width: 46px; height: 46px; }
-.lp-corner.tl { top: 14px; left: 14px; } .lp-corner.tr { top: 14px; right: 14px; }
-.lp-corner.bl { bottom: 14px; left: 14px; } .lp-corner.br { bottom: 14px; right: 14px; }
-.lp-no { font-size: 13px; text-align: left; margin-left: 50px; }
+.lp-crown { position: absolute; top: -19px; left: 50%; width: 64px; margin-left: -32px; background: var(--lband); padding: 0 6px; }
+.lp-crown svg { display: block; width: 100%; }
+.lp-no { font-size: 13px; text-align: left; }
 .lp-title { font-family: var(--font-hand); font-size: 58px; letter-spacing: .4em; margin: 6px 0 10px; text-indent: .4em; }
-.lp-photo { width: 120px; height: 140px; margin: 0 auto 12px; background: var(--blue-pale); border: 2.5px solid var(--ink); border-radius: 12px; padding: 6px; display: flex; align-items: flex-end; }
+.lp-photo { width: 120px; height: 140px; margin: 0 auto 12px; background: #fff; border: 2.5px solid var(--ink); border-radius: 12px; padding: 6px; display: flex; align-items: flex-end; }
 .lp-table { margin: 0 auto 14px; border-collapse: collapse; text-align: left; }
 .lp-table th { font-weight: 400; color: var(--ink-soft); padding: 3px 16px 3px 0; letter-spacing: .2em; }
 .lp-table td { font-weight: 700; padding: 3px 0; }
@@ -648,8 +635,6 @@ body.in-exam .tabs, body.in-exam .topline { display: none; }
   .result .kv { max-width: none; }
   .lp-frame { padding: 26px 14px 18px; }
   .lp-title { font-size: 42px; }
-  .lp-corner, .lp-corner .deco { width: 30px; height: 30px; }
-  .lp-no { margin-left: 34px; }
   .kv th { width: 84px; }
   .tk-seal { top: 54px; right: 12px; }
   .field { gap: 4px; padding: 6px; }

@@ -89,66 +89,86 @@ CN.avatarParts = {
   ],
   pattern: [
     { id: 'none', name: '없음' },
-    { id: 'split', name: '갈라진 앞머리' },
+    { id: 'split', name: '파란 두건' },
     { id: 'cheek', name: '진한 볼터치' },
   ],
 };
 
 CN.defaultAvatar = { body: 'white', ears: 'round', face: 'normal', pattern: 'none' };
 
-CN.avatarSVG = function (av, opt) {
+CN.avatarInk = '#262626';
+
+/* 증명사진 캐릭터의 SVG 내부 요소 (viewBox 0 0 120 120) */
+CN.avatarInner = function (av) {
   av = Object.assign({}, CN.defaultAvatar, av || {});
-  opt = opt || {};
   const P = CN.avatarParts;
   const fill = (P.body.find((b) => b.id === av.body) || P.body[0]).fill;
-  const ink = '#4B3A30';
-  const sw = 2.6;
+  const ink = CN.avatarInk;
+  const line = `stroke="${ink}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"`;
+  const hood = av.pattern === 'split';
+  const hoodFill = '#3F64A6';
   let ears = '';
   switch (av.ears) {
     case 'round':
-      ears = `<circle cx="34" cy="34" r="10" fill="${fill}" stroke="${ink}" stroke-width="${sw}"/><circle cx="86" cy="34" r="10" fill="${fill}" stroke="${ink}" stroke-width="${sw}"/>`;
+      ears = `<path d="M24 50 C18 38 26 28 36 31 C40 33 42 37 42 40" fill="${fill}" ${line}/><path d="M96 50 C102 38 94 28 84 31 C80 33 78 37 78 40" fill="${fill}" ${line}/>`;
       break;
-    case 'cat':
-      ears = `<path d="M24 52 L30 20 L50 36 Z" fill="${fill}" stroke="${ink}" stroke-width="${sw}" stroke-linejoin="round"/><path d="M96 52 L90 20 L70 36 Z" fill="${fill}" stroke="${ink}" stroke-width="${sw}" stroke-linejoin="round"/><path d="M31 30 L33 40 L41 36Z" fill="#F7B6C6"/><path d="M89 30 L87 40 L79 36Z" fill="#F7B6C6"/>`;
+    case 'cat': {
+      const ef = hood ? hoodFill : fill;
+      ears = `<path d="M22 56 C20 42 22 30 26 22 C34 26 42 32 48 38" fill="${ef}" ${line}/><path d="M98 56 C100 42 98 30 94 22 C86 26 78 32 72 38" fill="${ef}" ${line}/>`;
       break;
+    }
     case 'bunny':
-      ears = `<ellipse cx="46" cy="16" rx="8" ry="22" fill="${fill}" stroke="${ink}" stroke-width="${sw}"/><ellipse cx="74" cy="16" rx="8" ry="22" fill="${fill}" stroke="${ink}" stroke-width="${sw}"/><ellipse cx="46" cy="18" rx="3.5" ry="13" fill="#F7B6C6"/><ellipse cx="74" cy="18" rx="3.5" ry="13" fill="#F7B6C6"/>`;
+      ears = `<path d="M44 42 C38 26 38 6 46 4 C54 4 54 24 54 40" fill="${fill}" ${line}/><path d="M66 40 C66 24 66 4 74 4 C82 6 82 26 76 42" fill="${fill}" ${line}/>
+        <path d="M46 34 C43 24 44 12 47 10 C50 12 50 24 50 34Z" fill="#F4A3B5"/><path d="M70 34 C70 24 70 12 73 10 C76 12 77 24 74 34Z" fill="#F4A3B5"/>`;
       break;
     case 'horn':
-      ears = `<path d="M44 36 Q42 18 52 22 Q52 30 54 34Z" fill="#FFE59A" stroke="${ink}" stroke-width="${sw}" stroke-linejoin="round"/><path d="M76 36 Q78 18 68 22 Q68 30 66 34Z" fill="#FFE59A" stroke="${ink}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+      ears = `<path d="M46 38 C44 28 46 20 52 18 C54 24 56 30 56 36" fill="#FFE59A" ${line}/><path d="M74 38 C76 28 74 20 68 18 C66 24 64 30 64 36" fill="#FFE59A" ${line}/>`;
       break;
     case 'droop':
-      ears = `<ellipse cx="26" cy="54" rx="9" ry="15" transform="rotate(25 26 54)" fill="${fill}" stroke="${ink}" stroke-width="${sw}"/><ellipse cx="94" cy="54" rx="9" ry="15" transform="rotate(-25 94 54)" fill="${fill}" stroke="${ink}" stroke-width="${sw}"/>`;
+      ears = `<path d="M26 48 C12 50 8 66 14 74 C20 72 24 64 28 58" fill="${fill}" ${line}/><path d="M94 48 C108 50 112 66 106 74 C100 72 96 64 92 58" fill="${fill}" ${line}/>`;
       break;
   }
-  let pattern = '';
-  if (av.pattern === 'split') {
-    pattern = `<path d="M30 58 Q36 36 60 34 Q84 36 90 58 Q84 52 72 52 Q64 52 60 44 Q56 52 48 52 Q36 52 30 58Z" fill="#7DA7D9" stroke="${ink}" stroke-width="2"/>`;
+  /* 머리: 살짝 비대칭인 찹쌀떡 모양 */
+  const head = 'M60 34 C86 33 108 48 109 76 C110 100 92 116 60 116 C29 116 10 101 11 77 C12 49 33 35 60 34Z';
+  let hoodPath = '';
+  if (hood) {
+    hoodPath = `<path d="M12 72 C13 48 33 35 60 34 C86 33 107 48 108 72 C102 62 92 58 82 60 C72 61 64 56 60 47 C56 56 48 61 38 60 C28 58 18 62 12 72Z" fill="${hoodFill}" ${line}/>`;
   }
-  const blush = av.pattern === 'cheek' ? '#F58FA9' : '#F9B8C8';
-  let eyes, mouth, extra = '';
+  const blushC = av.pattern === 'cheek' ? '#F27D98' : '#F7A1B4';
+  const blush = (cx) => `<ellipse cx="${cx}" cy="88" rx="8.5" ry="5.2" fill="${blushC}"/>` +
+    `<path d="M${cx - 4.5} 91 L${cx - 2} 85 M${cx - 0.5} 91 L${cx + 2} 85 M${cx + 3.5} 91 L${cx + 6} 85" stroke="${ink}" stroke-width="1.2" stroke-linecap="round"/>`;
+  const eye = (cx, cy, rx, ry) => `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${ink}"/><circle cx="${cx + 1.4}" cy="${cy - 2}" r="1.9" fill="#fff"/><circle cx="${cx - 1.6}" cy="${cy + 2.2}" r=".9" fill="#fff"/>`;
+  let face = '';
   switch (av.face) {
     case 'smile':
-      eyes = `<path d="M44 70 Q48 64 52 70" fill="none" stroke="${ink}" stroke-width="3" stroke-linecap="round"/><path d="M68 70 Q72 64 76 70" fill="none" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>`;
-      mouth = `<path d="M54 80 Q60 88 66 80 Z" fill="#E86F7F" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>`;
+      face = `<path d="M38 80 Q44 72 50 80" fill="none" stroke="${ink}" stroke-width="2.8" stroke-linecap="round"/><path d="M70 80 Q76 72 82 80" fill="none" stroke="${ink}" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="M54 88 Q60 98 66 88 Z" fill="#E66A7E" ${line}/>`;
       break;
     case 'teary':
-      eyes = `<ellipse cx="48" cy="69" rx="4.2" ry="5.2" fill="${ink}"/><ellipse cx="72" cy="69" rx="4.2" ry="5.2" fill="${ink}"/><circle cx="49.5" cy="67" r="1.6" fill="#fff"/><circle cx="73.5" cy="67" r="1.6" fill="#fff"/>`;
-      mouth = `<path d="M55 84 Q60 79 65 84" fill="none" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>`;
-      extra = `<path d="M43 74 Q41 82 44 86 Q47 82 45 74Z" fill="#9FD3F5"/><path d="M77 74 Q79 82 76 86 Q73 82 75 74Z" fill="#9FD3F5"/>`;
+      face = eye(44, 79, 5.6, 6.6) + eye(76, 79, 5.6, 6.6) +
+        `<path d="M37 69 Q42 66 48 67" fill="none" stroke="${ink}" stroke-width="1.8" stroke-linecap="round"/><path d="M83 69 Q78 66 72 67" fill="none" stroke="${ink}" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M54 93 Q57 90 60 93 Q63 90 66 93" fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round"/>
+        <path d="M38 85 Q35 93 39 97 Q43 93 40 85Z" fill="#9CD3F4"/><path d="M82 85 Q85 93 81 97 Q77 93 80 85Z" fill="#9CD3F4"/>`;
       break;
     case 'serious':
-      eyes = `<ellipse cx="48" cy="70" rx="3.6" ry="4.4" fill="${ink}"/><ellipse cx="72" cy="70" rx="3.6" ry="4.4" fill="${ink}"/><path d="M42 61 L53 63" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/><path d="M78 61 L67 63" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>`;
-      mouth = `<path d="M55 82 L65 82" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>`;
+      face = eye(44, 80, 4.6, 5.4) + eye(76, 80, 4.6, 5.4) +
+        `<path d="M36 69 L50 72" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/><path d="M84 69 L70 72" stroke="${ink}" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M55 91 L65 91" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>`;
       break;
     default:
-      eyes = `<ellipse cx="48" cy="70" rx="3.8" ry="4.6" fill="${ink}"/><ellipse cx="72" cy="70" rx="3.8" ry="4.6" fill="${ink}"/><circle cx="49.2" cy="68.4" r="1.3" fill="#fff"/><circle cx="73.2" cy="68.4" r="1.3" fill="#fff"/>`;
-      mouth = `<path d="M56 80 Q58 83 60 80 Q62 83 64 80" fill="none" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>`;
+      face = eye(44, 80, 4.8, 5.8) + eye(76, 80, 4.8, 5.8) +
+        `<path d="M38 70 Q43 68 48 69" fill="none" stroke="${ink}" stroke-width="1.7" stroke-linecap="round"/><path d="M82 70 Q77 68 72 69" fill="none" stroke="${ink}" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M55 89 Q57.5 92.5 60 89 Q62.5 92.5 65 89" fill="none" stroke="${ink}" stroke-width="2" stroke-linecap="round"/>`;
   }
+  /* 앞발 */
+  const paws = `<path d="M40 117 C36 111 38 105 44 105 C48 105 49 109 47 112" fill="${fill}" ${line}/><path d="M80 117 C84 111 82 105 76 105 C72 105 71 109 73 112" fill="${fill}" ${line}/>`;
+  return `${ears}<path d="${head}" fill="${fill}" ${line}/>${hoodPath}${blush(28)}${blush(92)}${face}${paws}`;
+};
+
+CN.avatarSVG = function (av, opt) {
+  opt = opt || {};
   const bg = opt.bg ? `<rect x="0" y="0" width="120" height="120" rx="${opt.rx || 0}" fill="${opt.bg}"/>` : '';
-  return `<svg class="${opt.cls || 'avatar'}" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="수험자 증명사진">${bg}${ears}
-<path d="M60 30 C88 30 104 50 104 76 C104 100 86 112 60 112 C34 112 16 100 16 76 C16 50 32 30 60 30Z" fill="${fill}" stroke="${ink}" stroke-width="${sw}"/>
-${pattern}<ellipse cx="38" cy="80" rx="7" ry="4.2" fill="${blush}" opacity=".85"/><ellipse cx="82" cy="80" rx="7" ry="4.2" fill="${blush}" opacity=".85"/>${eyes}${mouth}${extra}</svg>`;
+  return `<svg class="${opt.cls || 'avatar'}" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="수험자 증명사진">${bg}${CN.avatarInner(av)}</svg>`;
 };
 
 /* 작은 장식 그림들 (자체 제작) */
