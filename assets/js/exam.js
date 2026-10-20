@@ -100,7 +100,7 @@ CN.exam = (function () {
     mount.innerHTML = `
       <section class="page paper">
         <h2 class="h-hand">시험장 입실 — 본인 확인</h2>
-        ${supervisor('수험표와 얼굴을 확인하겠습니다. 확인이 끝나면 유의사항을 읽어 주세요.')}
+        ${supervisor('수험표와 얼굴을 확인하겠습니다. 확인이 끝나면 유의사항을 읽어 주세요.' + (CN.isNight() ? '<br><small>…늦은 시간이네요. 시험이 끝나면 곧장 집으로 돌아가세요. 창문 밖은 보지 말고요.</small>' : ''))}
         <div class="idcheck">
           <div class="photo">${CN.avatarSVG(user.avatar)}</div>
           <table class="kv">

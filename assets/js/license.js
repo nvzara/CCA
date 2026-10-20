@@ -146,7 +146,7 @@ CN.license = (function () {
         ${stroke(roughLine(px + pw + 3, py + ph - 5, px + pw + 12, py + ph - 5 + (rnd() - 0.5) * 1.5, rnd, 0.4, 0), 2.8)}
         ${handText(74, 80, 36, lab.top)}
         ${handText(62, 156, 40, bottom)}
-        <text x="286" y="218" text-anchor="end" font-size="7" fill="${INK}" font-family="ui-monospace, monospace">No.${u.esc(l.licNo)}</text>
+        <text x="286" y="218" text-anchor="end" font-size="${l.footer ? 11 : 7}" fill="${INK}" font-family="${l.footer ? 'Gaegu, Yomogi, sans-serif' : 'ui-monospace, monospace'}">${u.esc(l.footer || 'No.' + l.licNo)}</text>
       </svg>
       ${l.status !== '유효' ? '<div class="lc-void">효력 상실</div>' : ''}
     </div>`;

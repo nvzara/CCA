@@ -108,12 +108,22 @@ CN.practical = (function () {
     return `<svg viewBox="0 0 60 60" class="plant">${wrap}</svg>`;
   }
   const stumpSVG = `<svg viewBox="0 0 60 60" class="plant"><ellipse cx="30" cy="48" rx="10" ry="4" fill="#C79A6B" stroke="${INK}" stroke-width="2"/><path d="M27 48 V40 L30 43 L33 40 V48" fill="#E8D5A8" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/></svg>`;
+  const oddSVG = `<svg viewBox="0 0 60 60" class="plant odd"><path d="M8 52 C4 40 12 30 20 32 C20 20 34 16 38 26 C46 20 56 30 52 40 C58 44 56 54 50 54 Z" fill="#5E7F4E" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/><g class="odd-eyes"><ellipse cx="26" cy="40" rx="3" ry="3.6" fill="#FFF8D6"/><ellipse cx="38" cy="40" rx="3" ry="3.6" fill="#FFF8D6"/><circle cx="26.5" cy="41" r="1.4" fill="${INK}"/><circle cx="38.5" cy="41" r="1.4" fill="${INK}"/></g></svg>`;
   const doneSVG = `<svg viewBox="0 0 60 60" class="plant"><path d="M14 34 L26 44 L46 18" fill="none" stroke="#7FB069" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
+  /* 공구 아이콘 (손그림) */
+  const ICO = {
+    hand: `<svg viewBox="0 0 48 48" class="ico" aria-hidden="true"><path d="M15 39 L14 25 C13.6 21.6 17.6 20.8 18 24 L18 12 C18 8.4 22 8.4 22 12 L22 9 C22 5.4 26 5.4 26 9 L26 11 C26 7.6 30 7.6 30 11 L30 14 C30 10.8 34 10.8 34 14 L34.4 30 C34.6 35 33 38.6 32 39 Z" fill="#FFF7E8" stroke="#262626" stroke-width="2.3" stroke-linejoin="round"/><path d="M22 12 V23 M26 10.5 V23 M30 13.5 V23" stroke="#262626" stroke-width="1.6" stroke-linecap="round"/><circle cx="20" cy="30" r="1.5" fill="#F08AA3"/><circle cx="25" cy="32" r="1.5" fill="#F08AA3"/><circle cx="29.5" cy="29" r="1.5" fill="#F08AA3"/><circle cx="23" cy="26.5" r="1.3" fill="#F08AA3"/><rect x="13" y="38" width="22" height="8" rx="2.5" fill="#F7B6C6" stroke="#262626" stroke-width="2.3"/><path d="M17 39.5 V44.5 M21 39.5 V44.5 M25 39.5 V44.5 M29 39.5 V44.5 M33 39.5 V44.5" stroke="#262626" stroke-width="1.2" opacity=".55"/></svg>`,
+    hoe: `<svg viewBox="0 0 48 48" class="ico" aria-hidden="true"><path d="M6 43 L21 28" stroke="#262626" stroke-width="8.6" stroke-linecap="round"/><path d="M6 43 L21 28" stroke="#C9955A" stroke-width="4.8" stroke-linecap="round"/><path d="M9.5 38.5 L12 41 M13.5 34.5 L16 37" stroke="#8E5F2E" stroke-width="1.4" stroke-linecap="round"/><rect x="18.5" y="23.5" width="6" height="6" rx="1.5" transform="rotate(45 21.5 26.5)" fill="#8E98A4" stroke="#262626" stroke-width="2"/><path d="M23 24 C23 17 26 11 31 10" fill="none" stroke="#262626" stroke-width="2.8" stroke-linecap="round"/><path d="M29 10 C33 7 39 7 42 10 C44 18 42 28 35 36 C33 28 31 18 29 10 Z" fill="#C3CCD6" stroke="#262626" stroke-width="2.3" stroke-linejoin="round"/><path d="M34 12 C37 16 37.5 22 36 27" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" opacity=".9"/></svg>`,
+    bag: `<svg viewBox="0 0 48 48" class="ico" aria-hidden="true"><path d="M27 15 C28 9 31 6 35 5 C34 9 31 13 27 15 Z" fill="#9CCB6A" stroke="#262626" stroke-width="2" stroke-linejoin="round"/><path d="M16 9 L19 15 L22 10 L25 15 L29 9 L31 16 L17 16 Z" fill="#E8CC96" stroke="#262626" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 18 C10 25 9.5 38 15 44 H33 C38.5 38 38 25 32 18 Z" fill="#E8CC96" stroke="#262626" stroke-width="2.3" stroke-linejoin="round"/><path d="M15 17.5 Q24 14 33 17.5" fill="none" stroke="#9C6B33" stroke-width="3.4" stroke-linecap="round"/><path d="M15 17.5 Q24 14 33 17.5" fill="none" stroke="#262626" stroke-width="1" stroke-linecap="round" opacity=".5"/><path d="M18 30 L22 30 M17 35 L21 35 M27 37 L31 37" stroke="#9C6B33" stroke-width="1.6" stroke-linecap="round"/><rect x="25" y="25" width="7" height="6" rx="1.2" fill="#F4DDB0" stroke="#9C6B33" stroke-width="1.4"/></svg>`,
+    flare: `<svg viewBox="0 0 48 48" class="ico" aria-hidden="true"><path d="M24 4 L25.6 9.5 L31 8 L27.4 12 L32 15 L26.2 15 L24 20 L21.8 15 L16 15 L20.6 12 L17 8 L22.4 9.5 Z" fill="#FFE07A" stroke="#262626" stroke-width="1.8" stroke-linejoin="round"/><rect x="19" y="21" width="10" height="21" rx="2.5" fill="#E8584F" stroke="#262626" stroke-width="2.3"/><path d="M19 27 H29 M19 36 H29" stroke="#fff" stroke-width="2"/><rect x="21" y="18.5" width="6" height="3.5" rx="1" fill="#8E98A4" stroke="#262626" stroke-width="1.6"/></svg>`,
+    drone: `<svg viewBox="0 0 48 48" class="ico" aria-hidden="true"><path d="M6 14 H18 M30 14 H42" stroke="#262626" stroke-width="2.4" stroke-linecap="round"/><path d="M12 14 V20 M36 14 V20" stroke="#262626" stroke-width="2.2"/><path d="M10 20 H38 C38 30 32 34 24 34 C16 34 10 30 10 20 Z" fill="#DDE7F2" stroke="#262626" stroke-width="2.3" stroke-linejoin="round"/><circle cx="24" cy="26" r="3.6" fill="#262626"/><circle cx="25.2" cy="24.8" r="1.2" fill="#fff"/><path d="M18 34 L15 40 M30 34 L33 40" stroke="#262626" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+  };
+
   const TOOLS = [
-    { id: 'hand', name: '손', icon: '✋', desc: '밑동을 잡고 뽑기' },
-    { id: 'hoe', name: '호미', icon: '⛏️', desc: '흙을 파서 뿌리째 들어내기' },
-    { id: 'bag', name: '수거 자루', icon: '🧺', desc: '뽑아 둔 풀을 담아 수거' },
+    { id: 'hand', name: '손', icon: ICO.hand, desc: '밑동을 잡고 뽑기' },
+    { id: 'hoe', name: '호미', icon: ICO.hoe, desc: '흙을 파서 뿌리째 들어내기' },
+    { id: 'bag', name: '수거 자루', icon: ICO.bag, desc: '뽑아 둔 풀을 담아 수거' },
   ];
 
   function weedBrief(app, mount) {
@@ -161,6 +171,12 @@ CN.practical = (function () {
     Object.entries(cfg.mix).forEach(([t, n]) => { for (let i = 0; i < n; i++) list.push(t); });
     while (list.length < N * N) list.push(null);
     const cells = u.shuffle(list).map((t) => ({ type: t, state: t ? 'grow' : 'empty', hits: 0, timer: 0 }));
+    /* 가끔 섞여 있는 정체불명의 덤불 (점수와 무관) */
+    if (CN.isNight() || Math.random() < 0.15) {
+      const empties = cells.map((c, i) => (c.state === 'empty' ? i : -1)).filter((i) => i >= 0);
+      if (empties.length) cells[empties[Math.floor(Math.random() * empties.length)]] = { type: null, state: 'odd', hits: 0, timer: 0 };
+    }
+    let duskSaid = false;
 
     const stat = { weeds: cells.filter((c) => c.type && P[c.type].weed).length, spawned: 0, removed: 0, protectedHit: 0, wrong: 0, alarmWork: 0, log: [] };
     let tool = 'hand', left = total, alarm = null, paused = 0, ended = false;
@@ -187,7 +203,8 @@ CN.practical = (function () {
         if (c.state === 'grow' || c.state === 'pulled' || c.state === 'dug1' || c.state === 'damaged') inner = plantSVG(c.type, c.state === 'grow' ? '' : c.state);
         else if (c.state === 'stump') inner = stumpSVG;
         else if (c.state === 'done') inner = doneSVG;
-        const label = cfg.labels && c.type && c.state !== 'done' && c.state !== 'empty' ? `<span class="pl">${u.esc(P[c.type].name.replace(/ \(보호\)/, ''))}</span>` : '';
+        else if (c.state === 'odd') inner = oddSVG;
+        const label = c.state === 'odd' ? (cfg.labels ? '<span class="pl">???</span>' : '') : cfg.labels && c.type && c.state !== 'done' && c.state !== 'empty' ? `<span class="pl">${u.esc(P[c.type].name.replace(/ \(보호\)/, ''))}</span>` : '';
         return `<button class="cell s-${c.state}" data-i="${i}">${inner}${label}</button>`;
       }).join('');
       fr.textContent = stat.removed;
@@ -198,6 +215,7 @@ CN.practical = (function () {
       if (paused > 0) return;
       const c = cells[i];
       if (alarm) { stat.alarmWork++; say('⚠️ 경보 중에는 작업을 멈춰야 합니다! (감점)', true); return; }
+      if (c.state === 'odd') { c.state = 'empty'; say('…방금 그건 뭐였지?'); return draw(); }
       if (c.state === 'empty' || c.state === 'done') return;
       const def = P[c.type];
       if (!def.weed) {
@@ -208,7 +226,7 @@ CN.practical = (function () {
         return draw();
       }
       if (tool === 'bag') {
-        if (c.state === 'pulled') { c.state = 'done'; stat.removed++; say(`🧺 ${def.name}을(를) 수거했습니다.`); }
+        if (c.state === 'pulled') { c.state = 'done'; stat.removed++; say(`${ICO.bag} ${def.name}을(를) 수거했습니다.`); }
         else if (c.state === 'stump') say('끊긴 뿌리는 자루로 담을 수 없습니다. 호미로 파내세요.', true);
         else say('아직 뽑지 않은 풀입니다.', true);
         return draw();
@@ -245,6 +263,8 @@ CN.practical = (function () {
       if (paused > 0) { paused--; return; }
       left--;
       ft.textContent = left;
+      field.style.setProperty('--dusk', Math.min(1, (1 - left / total) * 1.15).toFixed(2));
+      if (!duskSaid && left <= total * 0.2) { duskSaid = true; say('해가 지기 시작했어요. 서둘러 마치고 돌아가요.'); }
       let changed = false;
       cells.forEach((c) => {
         if ((c.state === 'pulled' || c.state === 'stump') && --c.timer <= 0) {
@@ -276,11 +296,11 @@ CN.practical = (function () {
 
     function startAlarm() {
       alarm = { left: 5 };
-      alarmBox.innerHTML = `<div class="alarm">⚠️ 삐익— 숲 가장자리에 <b>키메라 출현!</b> 작업 중지! <button class="btn btn-alert" id="flare">🎆 신호탄 발사</button> <span class="al-t"><b id="al">5</b>초</span></div>`;
+      alarmBox.innerHTML = `<div class="alarm"><span class="al-shake">⚠️ 삐익— 숲 가장자리에 <b>키메라 출현!</b> 작업 중지!</span> <button class="btn btn-alert" id="flare">${ICO.flare} 신호탄 발사</button> <span class="al-t"><b id="al">5</b>초</span></div>`;
       u.qs('#flare', alarmBox).onclick = () => {
         alarm = null;
         paused = 2;
-        alarmBox.innerHTML = '<div class="alarm ok">🚁 드론 도착. 위험 생물 대응 확인. 잠시 후 작업을 재개합니다.</div>';
+        alarmBox.innerHTML = `<div class="alarm ok">${ICO.drone} 드론 도착. 위험 생물 대응 확인. 잠시 후 작업을 재개합니다.</div>`;
         stat.log.push('위험 생물 경보에 신호탄으로 대응');
         timers.push(setTimeout(() => { alarmBox.innerHTML = ''; }, 2500));
       };

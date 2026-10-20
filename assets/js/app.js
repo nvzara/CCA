@@ -51,6 +51,84 @@ CN.ui = (function () {
   return { modal, confirm, alert, toast };
 })();
 
+/* ── 낮과 밤 ── 주소 뒤에 ?night 또는 ?day를 붙이면 강제로 바꿀 수 있다 */
+CN.isNight = function () {
+  const q = location.search;
+  if (/[?&]night\b/.test(q)) return true;
+  if (/[?&]day\b/.test(q)) return false;
+  const h = new Date().getHours();
+  return h >= 21 || h < 5;
+};
+CN.nightNotice = {
+  id: 'night', cat: '밤', date: '오늘', title: '지금은 시험장 문을 닫았어요',
+  body: '해가 졌습니다. 풀뽑기 작업은 접수하지 않습니다(운영규정 부칙 제1조).\n\n필기시험과 공개문제는 이용할 수 있지만, 너무 늦게까지 밖에 있지는 마세요. 창문은 꼭 닫고 주무세요.\n\n— 노동의 갑옷씨',
+};
+
+CN.clapCount = function (add) {
+  const KEY = 'chiikawa-kentei.claps';
+  let n = 0;
+  try { n = +localStorage.getItem(KEY) || 0; } catch (e) { /* 저장소를 쓸 수 없으면 0부터 */ }
+  if (add) {
+    n += add;
+    try { localStorage.setItem(KEY, String(n)); } catch (e) { /* 무시 */ }
+  }
+  return n;
+};
+
+/* ── 화면 아래에서 캐릭터가 튀어나와 한마디 ── */
+CN.popper = function (kind, mood, say) {
+  if (document.body.classList.contains('in-exam')) return;
+  const old = document.querySelector('.popper');
+  if (old) old.remove();
+  const el = document.createElement('div');
+  el.className = 'popper';
+  el.innerHTML = `<span class="talk">${CN.u.esc(say)}</span>${CN.charaSVG(kind, mood)}`;
+  document.body.appendChild(el);
+  setTimeout(() => el.classList.add('bye'), 2400);
+  setTimeout(() => el.remove(), 3000);
+};
+
+(function easterEggs() {
+  const words = [
+    ['tsutsuuraura', () => CN.popper('usagi', 'normal', '츠츠우라우라(津々浦々)')],
+    ['nantokanare', () => CN.popper('hachiware', 'shout', '어떻게든 되라—!!')],
+    ['chiikawa', () => CN.popper('chiikawa', 'smile', '…!')],
+    ['yaha', () => CN.popper('usagi', 'smile', '야하!')],
+    ['ura', () => CN.popper('usagi', 'shout', '우라!')],
+  ];
+  let buf = '';
+  document.addEventListener('keydown', (e) => {
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    if (e.key.length !== 1) return;
+    buf = (buf + e.key.toLowerCase()).slice(-16);
+    for (const [w, fn] of words) {
+      if (w === 'ura' && buf.endsWith('tsutsuura')) continue;
+      if (buf.endsWith(w)) { buf = ''; fn(); break; }
+    }
+  });
+
+  /* 간판의 새싹을 여러 번 누르면 */
+  let hits = 0, timer = null;
+  document.addEventListener('click', (e) => {
+    const mark = e.target.closest && e.target.closest('.logo-mark');
+    if (!mark) return;
+    hits++;
+    clearTimeout(timer);
+    timer = setTimeout(() => { hits = 0; }, 1500);
+    if (hits >= 5) {
+      hits = 0;
+      mark.classList.remove('pulled'); void mark.offsetWidth; mark.classList.add('pulled');
+      CN.ui.toast('뽑았다…! (풀 담당 갑옷씨: 그건 간판입니다)');
+    }
+  });
+
+  try {
+    console.log('%cちいかわ検定所%c\n먼가 작고 귀여운 녀석들의 검정소에 어서 오세요.',
+      'font: 700 22px Gaegu, sans-serif; color: #E8768F', 'font: 13px sans-serif; color: #4B3A30');
+  } catch (e) { /* 콘솔이 없으면 무시 */ }
+})();
+
 /* ── 팬 사이트 안내 ── */
 CN.fanNotice = function (force) {
   const KEY = 'chiikawa-kentei.notice';
@@ -62,7 +140,8 @@ CN.fanNotice = function (force) {
       <ul>
         <li>원작자 나가노 선생님 및 공식 권리자와는 <b>아무런 관계가 없으며</b>, 공식 서비스가 아닙니다.</li>
         <li><b>어떠한 이윤도 추구하지 않습니다.</b> 광고·판매·후원 요청이 없으며 모든 기능은 무료입니다.</li>
-        <li>원작의 캐릭터·명칭·세계관에 관한 모든 권리는 원작자와 공식 권리자께 있습니다. 공식 이미지는 사용하지 않았으며, 사이트의 그림은 모두 직접 그린 것입니다.</li>
+        <li>원작의 캐릭터·명칭·세계관에 관한 모든 권리는 원작자와 공식 권리자께 있습니다. 공식 이미지를 내려받아 쓰지 않았으며, 사이트의 그림은 모두 팬이 직접 그린 것입니다.</li>
+        <li>공식 영상·게시물은 YouTube·X의 공식 임베드 기능으로, <b>누르실 때만</b> 원본 그대로 불러옵니다. 이때 해당 플랫폼의 쿠키가 사용될 수 있어요.</li>
         <li>원작에서 공개되지 않은 부분(시험 과목, 문제, 합격 기준, 운영규정 등)은 팬의 상상으로 채운 것으로 <b>공식 설정이 아닙니다.</b></li>
         <li>발급되는 자격증은 재미를 위한 것으로 <b>법적 효력이 없습니다.</b></li>
         <li>입력하신 정보는 서버로 전송되지 않고 지금 사용하시는 브라우저에만 저장됩니다.</li>
@@ -86,6 +165,7 @@ CN.router = (function () {
     CN.exam.cleanup();
     CN.practical.cleanup();
     document.body.classList.remove('in-exam');
+    document.body.classList.toggle('night', CN.isNight());
     const path = (location.hash || '#/').slice(1) || '/';
     const main = document.getElementById('main');
     for (const r of routes) {
@@ -98,7 +178,7 @@ CN.router = (function () {
         return;
       }
     }
-    main.innerHTML = '<section class="page paper"><h2 class="h-hand">이 쪽은 찢어져 있어요…</h2><p>찾는 쪽이 없습니다.</p><a class="btn" href="#/">처음으로</a></section>';
+    main.innerHTML = `<section class="page paper torn center"><h2 class="h-hand">이 쪽은 찢어져 있어요…</h2>${CN.charaSVG('usagi', 'normal')}<p>누군가 이 쪽을 들고 어디론가 가 버린 것 같아요.<br><span class="muted">(어디로 갔냐고요? 츠츠우라우라…)</span></p><a class="btn" href="#/">처음으로</a></section>`;
   }
   function markNav(path) {
     CN.u.qsa('.tabs a').forEach((a) => a.classList.toggle('on', path.startsWith(a.getAttribute('href').slice(1)) && a.getAttribute('href') !== '#/'));
@@ -141,24 +221,30 @@ function renderUserbar() {
   /* 홈 */
   R.on('/', (main) => {
     const me = S.me();
+    const night = CN.isNight();
+    const today = u.today();
+    const fo = CN.fortunes[u.hash(today) % CN.fortunes.length];
+    const item = CN.luckyItems[u.hash(today + '#item') % CN.luckyItems.length];
+    const peek = night || u.hash(today + '#bush') % 6 === 0;
+    const cast = [['chiikawa', '치이카와'], ['hachiware', '하치와레'], ['usagi', '우사기']];
+    const chiikawa = CN.hall[1];
     main.innerHTML = `
-      <section class="hero">
+      <section class="hero sky ${night ? 'is-night' : ''}">
+        <div class="sky-deco" aria-hidden="true">${skyDoodles(night)}</div>
         <div class="hero-text">
-          <p class="hero-kicker">ちいかわ検定所 · 수험 안내 책자</p>
+          <p class="hero-kicker">ちいかわ検定所</p>
           <h1 class="hero-title">치이카와<br>자격검정소</h1>
-          <p class="hero-sub">작고 귀여워도, <b>시험은 진짜</b>입니다.</p>
+          <p class="hero-roman">nanka chiisakute kawaii kenteijo</p>
+          <p class="hero-sub">${night ? '오늘 접수는 끝났어요. <b>해가 지면 일찍 들어가요.</b>' : '먼가 작고 귀여운 녀석들처럼, <b>우리도 자격증</b> 하나 따 볼까요?'}</p>
           <div class="btns left">
             <a class="btn btn-main" href="#/apply">원서 접수하기</a>
             <a class="btn" href="#/certs">종목 안내 보기</a>
           </div>
         </div>
-        <div class="hero-art">
-          <div class="hero-avatars">
-            ${CN.avatarSVG({ body: 'white', ears: 'round', face: 'serious' })}
-            ${CN.avatarSVG({ body: 'white', ears: 'cat', pattern: 'split', face: 'smile' })}
-            ${CN.avatarSVG({ body: 'yellow', ears: 'bunny', face: 'normal' })}
-          </div>
-          <div class="hero-desk">${CN.deco.pencil}<span>수험서</span>${CN.deco.sprout}</div>
+        <div class="hero-stage">
+          <div class="cast">${cast.map(([k, n]) => `<button class="cast-one" data-kind="${k}" aria-label="${n}"><span class="bubble-at"></span>${CN.charaSVG(k, night ? 'sleep' : k === 'chiikawa' ? 'normal' : k === 'hachiware' ? 'smile' : 'normal', { label: n })}${night ? '<span class="zz">Zz</span>' : ''}</button>`).join('')}</div>
+          ${peek ? '<span class="bush" aria-hidden="true"><i></i><i></i></span>' : ''}
+          <div class="ground" aria-hidden="true"></div>
         </div>
       </section>
 
@@ -173,6 +259,27 @@ function renderUserbar() {
         ].map(([h, ic, t, s]) => `<a class="qcard" href="${h}">${ic}<b>${t}</b><span>${s}</span></a>`).join('')}
       </section>
 
+      <section class="home-grid">
+        <div class="fortune paper">
+          <h2 class="h-sub">오늘의 수험 운세</h2>
+          <div class="fo-body">
+            <div class="fo-who">${CN.avatarSVG(fo.who, { label: fo.name })}</div>
+            <div>
+              <span class="badge luck">${u.esc(fo.luck)}</span> <b>${u.esc(fo.name)}</b>
+              <p class="fo-say">「${u.esc(fo.say)}」</p>
+              <p class="fo-tip">${u.esc(fo.tip)}</p>
+              <p class="fo-item">럭키 아이템 · <b>${u.esc(item)}</b></p>
+            </div>
+          </div>
+          <p class="note">${u.esc(u.korDate(today))}의 운세 · 매일 바뀌어요</p>
+        </div>
+        <a class="hall-teaser paper" href="#/hall">
+          <h2 class="h-sub">작중 합격자 명부</h2>
+          ${CN.license.cardFront(hallLicense(chiikawa))}
+          <p>세 번째 봄에 붙은 그 5급부터, 슬쩍 2급까지. <b>명부 보기 →</b></p>
+        </a>
+      </section>
+
       <section class="section">
         <h2 class="sec-title"><span>시험 종목</span></h2>
         <div class="cards">${CN.certOrder.map((id) => certCard(id)).join('')}</div>
@@ -180,10 +287,89 @@ function renderUserbar() {
 
       <section class="section">
         <h2 class="sec-title"><span>노동 게시판</span></h2>
-        <div class="cork">${CN.notices.slice(0, 3).map(noteHTML).join('')}</div>
+        <div class="cork">${boardNotices().slice(0, 4).map(noteHTML).join('')}</div>
         <div class="btns"><a class="btn btn-sm" href="#/board">게시판 전체 보기</a></div>
+      </section>
+
+      <section class="section screen">
+        <h2 class="sec-title"><span>상영실</span></h2>
+        <div class="embeds two">${embedYouTube('m4yfCS_YBUU', 'TV 애니메이션 『ちいかわ』 PV')}${embedYouTube('qTROMuvibHs', '『映画ちいかわ 人魚の島のひみつ』 60초 특보')}</div>
+        <p class="note center">공식 영상은 YouTube 공식 임베드로, 누르실 때만 불러와요.</p>
+      </section>
+
+      <section class="home-grid">
+        <div class="paper">
+          <h2 class="h-sub">갱신 기록</h2>
+          <ul class="updates">${CN.updates.slice(0, 3).map((x) => `<li><span class="mono">${u.esc(x.date)}</span> ${u.esc(x.text)}</li>`).join('')}</ul>
+          <a class="btn btn-sm" href="#/about">사이트 소개·전체 기록</a>
+        </div>
+        <div class="paper">${clapBox()}</div>
       </section>`;
+
+    u.qsa('.cast-one', main).forEach((b) => {
+      b.onclick = () => castTalk(b, night);
+    });
+    bindClap(main);
+    CN.bindEmbeds(main);
+    const bush = u.qs('.bush', main);
+    if (bush) bush.onmouseenter = bush.onclick = () => bush.classList.add('gone');
   });
+
+  const LINES = {
+    chiikawa: { say: ['…!', '와…!', '야다—!', '흐에…', '(울어버렸다)', '…5급…!'], mood: ['shout', 'smile', 'teary', 'normal'] },
+    hachiware: { say: ['어떻게든 되라—!!', '~라는 거야?!', '울어버렸다!!!', '서두르지 않아도 괜찮아~', '마음이 두 개 있어~'], mood: ['shout', 'smile', 'normal'] },
+    usagi: { say: ['우라!', '야하!', '하아?!', '흐응', '푸루야', '루루루루루', '우라라라라아!'], mood: ['shout', 'smile', 'normal'] },
+  };
+  function castTalk(btn, night) {
+    const k = btn.dataset.kind;
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const say = night ? pick(['Zz…', '(잠꼬대) …5급…', '…음냐', '(뒤척)']) : pick(LINES[k].say);
+    const mood = night ? 'sleep' : pick(LINES[k].mood);
+    const svg = btn.querySelector('svg');
+    svg.outerHTML = CN.charaSVG(k, mood, { label: btn.getAttribute('aria-label') });
+    const at = btn.querySelector('.bubble-at');
+    at.innerHTML = `<span class="talk">${u.esc(say)}</span>`;
+    btn.classList.remove('hop'); void btn.offsetWidth; btn.classList.add('hop');
+    clearTimeout(btn._t);
+    btn._t = setTimeout(() => { at.innerHTML = ''; }, 1800);
+  }
+
+  function skyDoodles(night) {
+    const star = (x, y, s, r) => `<svg class="doodle" style="left:${x}%;top:${y}%;width:${s}px;transform:rotate(${r}deg)" viewBox="0 0 40 40"><path d="M20 6 L23 16 L33 17 L25 23 L28 33 L20 27 L12 33 L15 23 L7 17 L17 16Z" fill="${night ? '#FFF3B0' : '#FFFFFF'}" stroke="#262626" stroke-width="2.2" stroke-linejoin="round"/></svg>`;
+    const shoot = (x, y) => `<svg class="doodle shoot" style="left:${x}%;top:${y}%" viewBox="0 0 80 30"><path d="M6 24 L40 8 M12 28 L44 14 M20 29 L48 18" stroke="#262626" stroke-width="2" stroke-linecap="round" opacity=".7"/><path d="M52 4 L55 11 L62 12 L57 16 L59 23 L52 19 L46 23 L48 16 L43 12 L50 11Z" fill="#FFF3B0" stroke="#262626" stroke-width="2" stroke-linejoin="round"/></svg>`;
+    const cloud = (x, y, w) => `<svg class="doodle cloud" style="left:${x}%;top:${y}%;width:${w}px" viewBox="0 0 120 50"><path d="M14 42 C2 42 2 26 16 26 C16 12 36 8 44 18 C50 4 76 6 78 22 C92 16 108 24 102 40 Z" fill="#fff" stroke="#262626" stroke-width="2.2" stroke-linejoin="round"/></svg>`;
+    return night
+      ? star(8, 10, 22, -10) + star(46, 6, 16, 12) + star(88, 14, 20, 6) + star(66, 30, 12, 0) + star(30, 34, 10, 20) + shoot(70, 4) + `<span class="moon"></span>`
+      : cloud(46, 6, 100) + cloud(78, 22, 80) + star(64, 8, 16, -8) + star(92, 6, 12, 14) + star(40, 40, 10, 8) + shoot(30, 1);
+  }
+
+  function hallLicense(h) {
+    const today = new Date().toISOString();
+    return { licNo: 'canon-' + h.name, name: h.name, birth: '', avatar: h.avatar, certId: h.certId, grade: h.grade, passDate: today, issuedAt: today, status: '유효', footer: '원작 · ' + h.foot };
+  }
+
+  function boardNotices() {
+    return CN.isNight() ? [CN.nightNotice].concat(CN.notices) : CN.notices;
+  }
+
+  function clapBox() {
+    const n = CN.clapCount();
+    return `<h2 class="h-sub">응원 박수</h2>
+      <p>이 책자가 마음에 드셨다면 박수를 쳐 주세요. 관리인에게 전해지지는 않지만… 누군가 답례를 해 줄지도 몰라요.</p>
+      <div class="clap-row"><button class="btn btn-main clap">👏 짝짝</button><span class="note">지금까지 <b class="clap-n">${n}</b>번 쳤어요</span></div>
+      <div class="clap-reply"></div>`;
+  }
+  function bindClap(root) {
+    u.qsa('.clap', root).forEach((btn) => {
+      btn.onclick = () => {
+        const c = CN.claps[Math.floor(Math.random() * CN.claps.length)];
+        const n = CN.clapCount(1);
+        const box = btn.closest('.paper') || root;
+        u.qs('.clap-n', box).textContent = n;
+        u.qs('.clap-reply', box).innerHTML = `<div class="reply">${CN.avatarSVG(c.who, { cls: 'avatar mini', label: c.name })}<span><b>${u.esc(c.name)}</b> ${u.esc(c.say)}</span></div>`;
+      };
+    });
+  }
 
   function certCard(id) {
     const c = CN.certs[id];
@@ -197,7 +383,7 @@ function renderUserbar() {
       </div></a>`;
   }
   function noteHTML(n, i) {
-    return `<a class="note-card n${i % 4}" href="#/board/${n.id}"><span class="pin"></span><span class="nc-cat">${u.esc(n.cat)}</span><b>${u.esc(n.title)}</b><span class="nc-date">${u.esc(n.date)}</span></a>`;
+    return `<a class="note-card n${i % 4} ${n.id === 'night' ? 'is-night' : ''}" href="#/board/${n.id}"><span class="pin"></span><span class="nc-cat">${u.esc(n.cat)}</span><b>${u.esc(n.title)}</b><span class="nc-date">${u.esc(n.date)}</span></a>`;
   }
 
   /* 종목 안내 */
@@ -246,7 +432,7 @@ function renderUserbar() {
     const m = CN.ramenManual;
     main.innerHTML = `${title('검정 운영규정', '관계 규정 과목의 출제 근거입니다. 시험 전에 꼭 읽어 두세요.')}
       <section class="page paper lined">
-        ${CN.rules.map((r) => `<div class="rule"><b>${u.esc(r.t)}</b><p>${u.esc(r.b)}</p></div>`).join('')}
+        ${CN.rules.map((r) => `<div class="rule ${r.fine ? 'fine' : ''}"><b>${u.esc(r.t)}</b><p>${u.esc(r.b)}</p></div>`).join('')}
       </section>
       ${title('라멘 로우 콜 매뉴얼', '슈퍼 알바이터 필기·실기의 출제 근거입니다.')}
       <section class="page paper">
@@ -314,7 +500,12 @@ function renderUserbar() {
       if (!name) return CN.ui.alert('확인해 주세요', '성명을 적어 주세요.');
       if (!birth || new Date(birth) > new Date() || new Date(birth).getFullYear() < 1900) return CN.ui.alert('확인해 주세요', '생년월일을 바르게 적어 주세요.');
       S.register({ name, birth, avatar: av });
-      CN.ui.toast('수험 수첩을 만들었습니다!');
+      const egg = {
+        '치이카와': '…! (같은 이름이다)', '하치와레': '어떻게든 되라—!!', '가르마': '정발명파시군요. 어떻게든 되라—!!',
+        '우사기': '우라!', '토끼': '야하!', '모몽가': '귀엽다고 말해 줘!', '랏코': '…토벌 랭킹 1위께서 여기까지?',
+        '시사': '우레시사—!', '쿠리만쥬': '하아…', '카니': '큭큭', '파자마': '우 우 와 와 우와 우와와',
+      }[name.replace(/\s/g, '')];
+      CN.ui.toast(egg ? `수험 수첩을 만들었습니다! ${egg}` : '수험 수첩을 만들었습니다!');
       R.go('#/my');
     };
   });
@@ -448,12 +639,23 @@ function renderUserbar() {
     if (r.pass && a.kind === 'written' && c.practical) next = `<p>🎉 필기시험에 합격했습니다! 합격일로부터 2년간 필기가 면제됩니다.</p><a class="btn btn-main" href="#/apply?c=${a.certId}">실기시험 접수하기</a>`;
     else if (r.pass) next = '<p>🎉 최종 합격입니다! 자격증을 발급받으세요.</p><a class="btn btn-main" href="#/issue">자격증 발급 신청</a>';
     else next = `<p>${a.kind === 'written' ? '과목별 점수를 확인하고 약한 과목을 보완해 다시 도전하세요. 공부한 내용은 반드시 나옵니다.' : '작업 기록을 확인하고 다시 도전하세요.'}</p><a class="btn btn-main" href="#/apply?c=${a.certId}">다시 접수하기</a> <a class="btn" href="#/practice?c=${a.certId}">공개문제 복습</a>`;
+    const prevFails = S.myApps().filter((x) => x.no !== a.no && x.certId === a.certId && x.grade === a.grade && x.result && !x.result.pass &&
+      new Date(x.finishedAt) < new Date(a.finishedAt)).length;
+    let cheer;
+    if (r.voided) cheer = CN.exam.supervisor('…규칙은 규칙이에요. 다음엔 끝까지 자리를 지켜 주세요.');
+    else if (r.pass && prevFails >= 2) {
+      const spring = a.certId === 'weed' && a.grade === 5;
+      cheer = `<div class="cheer spring">${CN.charaSVG('chiikawa', 'teary')}${CN.charaSVG('hachiware', 'shout')}${CN.charaSVG('usagi', 'smile')}
+        <div><b class="h-hand">${spring ? '세 번째 봄' : (prevFails + 1) + '번째 도전'}</b><p>${spring ? '두 번 떨어지고, 그래도 계속 공부해서 붙었어요. 어디서 많이 본 이야기죠.' : '몇 번이고 다시 도전해서 붙었어요.'} 울어버렸다!!!</p></div></div>`;
+    } else if (r.pass) cheer = `<div class="cheer">${CN.charaSVG('hachiware', 'shout')}${CN.charaSVG('usagi', 'smile')}<div><p class="talk-line">「어떻게든 됐다—!!」</p><p class="note">${a.certId === 'sake' ? '쿠리만쥬: 하아… (건배)' : a.certId === 'alba' ? '시사: 우레시사—!' : '우사기: 야하!'}</p></div></div>`;
+    else cheer = `<div class="cheer">${CN.charaSVG('chiikawa', 'teary')}${CN.charaSVG('hachiware', 'normal')}<div><p class="talk-line">「서두르지 않아도 괜찮아~」</p><p class="note">${prevFails >= 1 ? '치이카와도 5급에 두 번 떨어졌어요. 세 번째엔 붙었고요.' : '울어도 괜찮아요. 공부한 건 다음 시험에 꼭 나와요.'}</p></div></div>`;
     main.innerHTML = `${title('채점 결과 통지서')}
       <section class="page paper result">
         ${stamp}
         <table class="kv"><tr><th>수험번호</th><td class="mono">${u.esc(a.no)}</td></tr><tr><th>성명</th><td>${u.esc(me.name)}</td></tr><tr><th>종목</th><td>${u.esc(CN.fullName(a.certId, a.grade))} ${kindName(a.kind)}시험</td></tr><tr><th>채점일</th><td>${u.esc(u.korDate(a.finishedAt))}</td></tr></table>
         ${body}
         ${r.voided ? '<p class="red">시험장 이탈 등 운영규정 위반으로 무효(실격) 처리되었습니다.</p>' : ''}
+        ${cheer}
         <div class="next">${next}</div>
       </section>`;
   });
@@ -466,7 +668,8 @@ function renderUserbar() {
         <label class="field-l">생년월일 <input id="bd" type="date"></label>
         <div class="btns"><button class="btn btn-main" id="go">조회</button></div>
         <div id="out"></div>
-      </section>`;
+      </section>
+      <a class="hall-link paper" href="#/hall">${CN.charaSVG('usagi', 'smile')}<span><b class="h-hand">작중 합격자 명부</b><br>치이카와의 5급부터 우사기의 슬쩍 2급까지. 원작 합격자들의 자격증을 모아 두었어요.</span></a>`;
     u.qs('#go', main).onclick = () => {
       const no = u.qs('#no', main).value.trim().toUpperCase(), bd = u.qs('#bd', main).value;
       const a = S.getApp(no);
@@ -551,6 +754,14 @@ function renderUserbar() {
     u.qs('#go', main).onclick = () => {
       const no = u.qs('#no', main).value.trim().toUpperCase(), nm = u.qs('#nm', main).value.trim(), dt = u.qs('#dt', main).value;
       const out = u.qs('#out', main);
+      const canon = {
+        '우사기': '이 수험생은 이미 풀뽑기 검정 2급에 슬쩍 합격해 있습니다. (사진은 역시 그 얼굴)',
+        '치이카와': '원작의 치이카와는 세 번째 도전 끝에 풀뽑기 검정 5급에 합격했어요. 이 대장에는 없지만, 모두가 알고 있어요.',
+        '하치와레': '원작의 하치와레는 풀뽑기 검정 5급을 한 번에 합격했어요.',
+        '쿠리만쥬': '술 자격증 보유자… 지만 지금은 도마뱀이 자격증을 들고 도망가서 확인할 수 없습니다. (禁)',
+        '시사': '슈퍼 알바이터 보유. 술 자격증은 아직 공부 중이에요.',
+      }[nm.replace(/\s/g, '')];
+      if (canon && !S.findLicense(no)) { out.innerHTML = `<div class="elig ok"><p>📒 ${u.esc(canon)}</p><p class="note"><a href="#/hall">작중 합격자 명부 보기</a></p></div>`; return; }
       const m = no.match(/^(\d{4}-[WSA]\d-\d{6})-([0-9A-Z])$/);
       if (!m) { out.innerHTML = '<div class="elig ng"><p>⚠️ 자격번호 형식이 올바르지 않습니다. (예: 2026-W5-000001-K)</p></div>'; return; }
       if (u.checkChar(m[1]) !== m[2]) { out.innerHTML = '<div class="elig ng"><p>⚠️ 검증문자가 맞지 않습니다. 위조되었거나 잘못 적은 번호입니다.</p></div>'; return; }
@@ -647,13 +858,172 @@ function renderUserbar() {
 
   /* 게시판 */
   R.on('/board', (main) => {
-    main.innerHTML = `${title('노동 게시판', '검정소의 공지와 안내를 붙여 둡니다.')}<div class="cork">${CN.notices.map(noteHTML).join('')}</div>`;
+    main.innerHTML = `${title('노동 게시판', '검정소의 공지와 안내를 붙여 둡니다.')}<div class="cork">${boardNotices().map(noteHTML).join('')}</div>`;
   });
   R.on('/board/:id', (main, id) => {
-    const n = CN.notices.find((x) => String(x.id) === id);
+    const n = boardNotices().find((x) => String(x.id) === id) || (id === 'night' ? CN.nightNotice : null);
     if (!n) return R.go('#/board');
     main.innerHTML = `<section class="page paper lined"><span class="badge">${u.esc(n.cat)}</span><h2 class="h-hand">${u.esc(n.title)}</h2><p class="muted">${u.esc(n.date)} · 치이카와 자격검정소</p>
       ${n.body.split('\n').map((p) => (p ? `<p>${u.esc(p)}</p>` : '')).join('')}<div class="btns"><a class="btn" href="#/board">목록</a></div></section>`;
+  });
+
+  /* ── 공식 콘텐츠 임베드: 누를 때만 각 플랫폼에서 불러온다 ── */
+  function embedYouTube(id, label) {
+    return `<div class="embed yt" data-yt="${u.esc(id)}"><button class="embed-load"><span class="play">▶</span><b>${u.esc(label)}</b><small>누르면 YouTube에서 공식 영상을 불러옵니다</small></button></div>`;
+  }
+  function embedX(url, label) {
+    return `<div class="embed x" data-x="${u.esc(url)}"><button class="embed-load"><span class="play">𝕏</span><b>${u.esc(label)}</b><small>누르면 X에서 공식 게시물을 불러옵니다</small></button></div>`;
+  }
+  function bindEmbeds(root) {
+    u.qsa('.embed', root).forEach((box) => {
+      const btn = u.qs('.embed-load', box);
+      if (!btn) return;
+      btn.onclick = () => {
+        if (box.dataset.yt) {
+          box.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(box.dataset.yt)}?autoplay=1&rel=0" title="${u.esc(btn.querySelector('b').textContent)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>`;
+          return;
+        }
+        const href = box.dataset.x;
+        box.innerHTML = `<blockquote class="twitter-tweet" data-lang="ko" data-dnt="true"><a href="${u.esc(href)}">X에서 보기</a></blockquote><p class="note embed-fallback">불러오지 못했다면 <a href="${u.esc(href)}" target="_blank" rel="noopener">X에서 직접 보기</a></p>`;
+        const done = () => window.twttr && window.twttr.widgets && window.twttr.widgets.load(box);
+        if (window.twttr && window.twttr.widgets) return done();
+        const sc = document.createElement('script');
+        sc.src = 'https://platform.twitter.com/widgets.js';
+        sc.async = true;
+        sc.onload = done;
+        document.head.appendChild(sc);
+      };
+    });
+  }
+  CN.bindEmbeds = bindEmbeds;
+  const OFFICIAL = {
+    pv: ['m4yfCS_YBUU', 'TV 애니메이션 『ちいかわ』 PV'],
+    pv2: ['TET5lDDhetM', '애니메이션 『ちいかわ』 제2탄 PV'],
+    movie: ['qTROMuvibHs', '『映画ちいかわ 人魚の島のひみつ』 60초 특보'],
+    intro: ['UjwgMKk9KA8', '【공식】 これが『ちいかわ』です①'],
+    holder: ['https://twitter.com/chiikawa_kouhou/status/1997863705636110768', '공식 굿즈 · 草むしり検定証 카드홀더 (치이카와 5급 · 우사기 2급)'],
+  };
+
+  /* 작중 합격자 명부 */
+  const LIZARD = '<svg class="lizard" viewBox="0 0 60 30" aria-hidden="true"><path d="M8 18 Q2 26 10 26 Q20 26 26 20 Q36 22 46 18 Q54 16 56 12 Q50 8 42 10 Q34 8 26 12 Q16 10 8 18Z" fill="#9CCB6A" stroke="#262626" stroke-width="2" stroke-linejoin="round"/><path d="M20 20 L16 28 M34 20 L38 28 M30 12 L26 4 M42 11 L46 4" stroke="#262626" stroke-width="2" stroke-linecap="round"/><circle cx="50" cy="12" r="1.6" fill="#262626"/><rect x="46" y="14" width="10" height="7" rx="1.5" fill="#F4D5A6" stroke="#262626" stroke-width="1.6"/></svg>';
+  R.on('/hall', (main) => {
+    main.innerHTML = `${title('작중 합격자 명부', '원작에서 자격을 딴 이들의 자격증을 팬이 그려 보았어요. 카드를 눌러 보세요.')}
+      <div class="hall">${CN.hall.map((h, i) => `<article class="hall-item paper">
+        <button class="hall-card" data-i="${i}" aria-label="${u.esc(h.name)}의 자격증">${CN.license.cardFront(hallLicense(h))}${h.stamp ? `<span class="ban">禁</span>${LIZARD}` : ''}</button>
+        <div><h3 class="h-hand">${u.esc(h.name)} <span class="badge">${u.esc(CN.fullName(h.certId, h.grade))}</span></h3><p>${u.esc(h.story)}</p></div></article>`).join('')}</div>
+      <section class="page paper">
+        <h3 class="h-sub">공식 검정증은 이렇게 생겼어요</h3>
+        <p>공식 굿즈로 나온 草むしり検定証 카드홀더입니다. 공식 계정의 게시물을 그대로 불러와 보여 드려요.</p>
+        ${embedX(OFFICIAL.holder[0], OFFICIAL.holder[1])}
+      </section>
+      <p class="note">명부의 카드는 원작 설정을 바탕으로 팬이 그린 것이며 공식 이미지가 아닙니다. 4급·1급 카드 색은 원작에서 공개되지 않아 이 책자에서 정했어요.</p>`;
+    u.qsa('.hall-card', main).forEach((b) => {
+      b.onclick = () => {
+        const h = CN.hall[+b.dataset.i];
+        if (h.stamp) {
+          const on = b.classList.toggle('banned');
+          CN.ui.toast(on ? '앗, 도마뱀이 면허증을 물고 도망갔다…! → 禁' : '면허증을 되찾았다. 하아…');
+        } else if (h.name === '치이카와') CN.popper('chiikawa', 'teary', '…!! (울어버렸다)');
+        else if (h.name === '하치와레') CN.popper('hachiware', 'shout', '어떻게든 됐다—!!');
+        else if (h.name === '우사기') CN.popper('usagi', 'smile', '야하! (슬쩍)');
+        else CN.ui.toast(h.name === '시사' ? '우레시사—!' : '…');
+      };
+    });
+    bindEmbeds(main);
+  });
+
+  /* 고서점 퀴즈 */
+  R.on('/quiz', (main) => {
+    const draw = () => {
+      const qs = u.shuffle(CN.fanQuiz).slice(0, 10).map((q) => ({ q, order: u.shuffle([0, 1, 2, 3]) }));
+      let done = 0, right = 0;
+      main.innerHTML = `${title('카니의 고서점 · 먼작귀 상식 퀴즈', '시험 공부하다 쉬어 가는 코너예요. 공인 검정은 아니에요. 큭큭.')}
+        <section class="page paper kani">
+          <div class="kani-head">${CN.avatarSVG({ kind: 'kani' }, { label: '카니' })}<p>어서 오세요… 수험서 사러 오셨어요? 그 전에, 이 책들 좀 정리해 주실래요? <span class="muted">(10문제, 보기를 누르면 바로 정답이 나와요)</span></p></div>
+          <div class="practice">${qs.map((x, i) => `<div class="q pq" data-i="${i}"><div class="q-text"><b>${i + 1}.</b> ${u.esc(x.q.q)}</div>
+            <ol class="q-opts">${x.order.map((oi, k) => `<li data-k="${k}"><span class="num">${'①②③④'[k]}</span> ${u.esc(x.q.o[oi])}</li>`).join('')}</ol><div class="expl"></div></div>`).join('')}</div>
+          <div id="quiz-result"></div>
+        </section>`;
+      u.qsa('.pq', main).forEach((box) => {
+        const x = qs[+box.dataset.i];
+        u.qsa('li', box).forEach((li) => {
+          li.onclick = () => {
+            if (box.classList.contains('done')) return;
+            box.classList.add('done');
+            const k = +li.dataset.k, ok = x.order.indexOf(x.q.a);
+            u.qsa('li', box)[ok].classList.add('right');
+            if (k !== ok) li.classList.add('wrong'); else right++;
+            u.qs('.expl', box).innerHTML = `<b>${k === ok ? '⭕' : '❌'}</b> ${u.esc(x.q.e)}`;
+            if (++done === qs.length) showResult();
+          };
+        });
+      });
+      function showResult() {
+        const rank = CN.fanQuizRanks.find((r) => right >= r.min);
+        const text = `치이카와 자격검정소 · 고서점 퀴즈 ${right}/10 — ${rank.title}`;
+        u.qs('#quiz-result', main).innerHTML = `<div class="quiz-rank">${CN.avatarSVG(rank.who)}<div><p class="big-score">${right}<small>/10</small></p>
+          <b class="h-hand">${u.esc(rank.title)}</b><p>${u.esc(rank.msg)}</p>
+          <div class="btns left"><button class="btn btn-main" id="again">다른 책 정리하기</button><button class="btn" id="copy">결과 복사</button></div></div></div>`;
+        u.qs('#again', main).onclick = draw;
+        u.qs('#copy', main).onclick = () => {
+          const t = text + ' ' + location.href.split('#')[0] + '#/quiz';
+          (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => CN.ui.toast('복사했어요. 자랑하러 가요!'), () => CN.ui.toast(text));
+        };
+        u.qs('#quiz-result', main).scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+    draw();
+  });
+
+  /* 사이트 소개 */
+  R.on('/about', (main) => {
+    const site = location.href.split('#')[0];
+    const bannerTag = `<a href="${site}"><img src="${site}assets/img/banner.png" width="200" height="40" alt="치이카와 자격검정소"></a>`;
+    main.innerHTML = `${title('이 책자에 대하여', '치이카와 자격검정소 · 비공식 팬 사이트')}
+      <section class="page paper about">
+        <h3 class="h-sub">관리인의 말</h3>
+        <p>치이카와가 세 번째 도전 끝에 풀뽑기 검정 5급에 합격하던 날을 기억하시나요.</p>
+        <p>작고 귀여운 녀석들이 오늘도 풀을 뽑고, 수험서를 사고, 시험을 보고, 떨어지고, 또 공부합니다. 그 모습을 보며 각자의 시험을 떠올린 분이 많았을 거예요. 그래서 그 세계의 시험장을 하나 만들어 보았습니다.</p>
+        <p>떨어져도 괜찮아요. 서두르지 않아도 괜찮고요. 어떻게든 될 거예요.</p>
+        <p class="sign">— 치이카와를 좋아하는 관리인</p>
+      </section>
+      <section class="page paper">
+        <h3 class="h-sub">이 사이트는</h3>
+        <ul class="dots">
+          <li>나가노 선생님의 『치이카와 — 먼가 작고 귀여운 녀석』을 좋아하는 팬이 만든 <b>비공식·비영리 팬 사이트</b>입니다. 원작자·공식 권리자와 관계가 없어요.</li>
+          <li>사이트의 그림은 모두 팬이 직접 그렸어요. 공식 이미지를 내려받아 쓰지 않습니다.</li>
+          <li>공식 영상과 게시물은 YouTube·X의 <b>공식 임베드</b>로, 누르실 때만 불러와 원본 그대로 보여 드려요.</li>
+          <li>원작에서 공개되지 않은 시험 과목·문제·합격 기준·운영규정은 팬의 상상입니다.</li>
+        </ul>
+      </section>
+      <section class="page paper">
+        <h3 class="h-sub">공식으로 즐기기</h3>
+        <p>치이카와를 처음 만났던 그때의 기분을 공식 영상으로 다시 떠올려 보세요.</p>
+        <div class="embeds">${embedYouTube(...OFFICIAL.pv)}${embedYouTube(...OFFICIAL.pv2)}${embedYouTube(...OFFICIAL.intro)}${embedYouTube(...OFFICIAL.movie)}</div>
+        <ul class="links">
+          <li><a href="https://www.anime-chiikawa.jp/" target="_blank" rel="noopener">TV 애니메이션 『ちいかわ』 공식 사이트</a></li>
+          <li><a href="https://chiikawamarket.jp/" target="_blank" rel="noopener">ちいかわマーケット (공식 굿즈)</a></li>
+          <li><a href="https://x.com/ngntrtr" target="_blank" rel="noopener">나가노 선생님 X (@ngntrtr)</a> — 연재는 여기서</li>
+          <li><a href="https://x.com/anime_chiikawa" target="_blank" rel="noopener">애니메이션 공식 X (@anime_chiikawa)</a></li>
+          <li><a href="https://x.com/chiikawa_kouhou" target="_blank" rel="noopener">공식 굿즈 X (@chiikawa_kouhou)</a></li>
+        </ul>
+        <p class="note">공식 작품과 공식 굿즈로 치이카와와 친구들을 응원해 주세요.</p>
+      </section>
+      <section class="page paper">
+        <h3 class="h-sub">링크 · 배너</h3>
+        <p>링크는 자유예요. 알려 주지 않으셔도 괜찮아요. 배너는 저장해서 쓰셔도 됩니다.</p>
+        <div class="banner-row"><img src="assets/img/banner.png" width="200" height="40" alt="치이카와 자격검정소 배너"></div>
+        <textarea class="banner-code" readonly rows="2">${u.esc(bannerTag)}</textarea>
+      </section>
+      <section class="page paper">
+        <h3 class="h-sub">갱신 기록</h3>
+        <ul class="updates">${CN.updates.map((x) => `<li><span class="mono">${u.esc(x.date)}</span> ${u.esc(x.text)}</li>`).join('')}</ul>
+      </section>
+      <section class="page paper">${clapBox()}</section>`;
+    bindEmbeds(main);
+    bindClap(main);
+    const ta = u.qs('.banner-code', main);
+    ta.onclick = () => ta.select();
   });
 
   /* 자주 묻는 질문 */
