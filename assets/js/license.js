@@ -100,8 +100,8 @@ CN.license = (function () {
 
   function seal(text) {
     return `<svg viewBox="0 0 80 80" class="seal" aria-hidden="true"><circle cx="40" cy="40" r="34" fill="none" stroke="#D9485F" stroke-width="4"/><circle cx="40" cy="40" r="28" fill="none" stroke="#D9485F" stroke-width="1.6"/>
-      <text x="40" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="#D9485F" font-family="Gaegu, sans-serif">${text[0]}</text>
-      <text x="40" y="54" text-anchor="middle" font-size="13" font-weight="700" fill="#D9485F" font-family="Gaegu, sans-serif">${text[1]}</text></svg>`;
+      <text x="40" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="#D9485F" font-family="Gaegu, Yomogi, sans-serif">${text[0]}</text>
+      <text x="40" y="54" text-anchor="middle" font-size="13" font-weight="700" fill="#D9485F" font-family="Gaegu, Yomogi, sans-serif">${text[1]}</text></svg>`;
   }
 
   /* 번호에서 만든 확인 무늬 (도장 갑옷씨가 대조하는 무늬) */
@@ -116,7 +116,7 @@ CN.license = (function () {
   }
 
   function handText(x, y, size, text, anchor) {
-    return `<text x="${x}" y="${y}" font-family="Gaegu, sans-serif" font-size="${size}" fill="${INK}" stroke="${INK}" stroke-width="${(size / 110).toFixed(2)}" paint-order="stroke" ${anchor ? `text-anchor="${anchor}"` : ''}>${u.esc(text)}</text>`;
+    return `<text x="${x}" y="${y}" font-family="Gaegu, Yomogi, sans-serif" font-size="${size}" fill="${INK}" stroke="${INK}" stroke-width="${(size / 110).toFixed(2)}" paint-order="stroke" ${anchor ? `text-anchor="${anchor}"` : ''}>${u.esc(text)}</text>`;
   }
 
   /* 카드 공통 테두리: 굵은 바깥선 + 왕관 자리가 끊긴 가는 안쪽선 */
@@ -130,7 +130,7 @@ CN.license = (function () {
     const id = 'lc' + u.hash(l.licNo).toString(36);
     const lab = LABEL[l.certId];
     const bottom = lab.bottom(l.grade);
-    const px = 214, py = 50, pw = 70, ph = 92;
+    const px = 214, py = 44, pw = 70, ph = 92;
     return `<div class="lic-card front">
       <svg viewBox="0 0 320 250" class="lic-svg" role="img" aria-label="${u.esc(CN.fullName(l.certId, l.grade))} 자격증 앞면">
         <defs><clipPath id="${id}c"><rect x="${px + 1}" y="${py + 1}" width="${pw - 2}" height="${ph - 2}"/></clipPath></defs>
@@ -138,7 +138,7 @@ CN.license = (function () {
         ${crown(177, 18, 1.15, rnd)}
         <rect x="${px}" y="${py}" width="${pw}" height="${ph}" fill="#fff"/>
         <g clip-path="url(#${id}c)"><svg x="${px - 17}" y="${py + 6}" width="${pw + 34}" height="${pw + 34}" viewBox="0 0 120 120">${CN.avatarInner(l.avatar, { noPaws: true })}</svg></g>
-        ${stroke(roughLine(19, 98, px, py + ph * 0.64 + (rnd() - 0.5) * 3, rnd, 1.1, 0.4), 3)}
+        ${stroke(roughLine(19, 102, px, 103.5 + (rnd() - 0.5) * 1.5, rnd, 0.7, 0.4), 3)}
         ${stroke(roughLine(px, py, px + pw, py + (rnd() - 0.5) * 2, rnd, 0.8), 2.8)}
         ${stroke(roughLine(px + pw, py, px + pw + (rnd() - 0.5) * 2, py + ph, rnd, 0.8), 2.8)}
         ${stroke(roughLine(px + pw, py + ph, px, py + ph + (rnd() - 0.5) * 2, rnd, 0.8), 2.8)}
@@ -188,7 +188,7 @@ CN.license = (function () {
       ${frame}
       <div class="lp-crown"><svg viewBox="280 8 40 22">${crown(300, 18, 1, rnd)}</svg></div>
       <div class="lp-frame">
-        <div class="lp-no mono">제 ${u.esc(l.licNo)} 호</div>
+        <div class="lp-no">제 ${u.esc(l.licNo)} 호</div>
         <h1 class="lp-title">자 격 증</h1>
         <div class="lp-photo"><svg viewBox="0 0 120 120">${CN.avatarInner(l.avatar, { noPaws: true })}</svg></div>
         <table class="lp-table">

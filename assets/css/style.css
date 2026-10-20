@@ -20,7 +20,7 @@
   --c-alba: #FDF0B8;
   --radius: 18px;
   --shadow: 3px 3px 0 var(--ink);
-  --font-hand: 'Gaegu', 'Gowun Dodum', sans-serif;
+  --font-hand: 'Gaegu', 'Yomogi', 'Gowun Dodum', sans-serif;
   --font-body: 'Gowun Dodum', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
 }
 
@@ -530,19 +530,21 @@ body.in-exam .tabs, body.in-exam .topline { display: none; }
 .lp-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .lp-crown { position: absolute; top: 1.2%; left: 50%; width: 52px; margin-left: -26px; z-index: 1; }
 .lp-crown svg { display: block; width: 100%; }
-.lp-frame { position: relative; padding: 56px 48px 40px; text-align: center; }
-.lp-no { font-size: 13px; text-align: left; }
+.lp-frame { position: relative; padding: 56px 48px 40px; text-align: center; font-family: var(--font-hand); color: #222; }
+.lp-no { font-size: 18px; text-align: left; }
 .lp-title { font-family: var(--font-hand); font-weight: 400; font-size: 58px; letter-spacing: .4em; margin: 6px 0 10px; text-indent: .4em; }
 .lp-photo { width: 120px; height: 140px; margin: 0 auto 12px; background: #fff; border: 2.6px solid #222; border-radius: 3px; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
-.lp-photo svg { flex: none; width: 146%; height: auto; margin-bottom: -22%; }
+.lp-photo svg { flex: none; width: 160%; height: auto; margin-bottom: -12%; }
 .lp-table { margin: 0 auto 14px; border-collapse: collapse; text-align: left; }
-.lp-table th { font-weight: 400; color: var(--ink-soft); padding: 3px 16px 3px 0; letter-spacing: .2em; }
-.lp-table td { font-weight: 700; padding: 3px 0; }
-.lp-text { font-size: 17px; line-height: 1.9; margin: 8px 10px; }
-.lp-date { font-size: 18px; margin: 14px 0 6px; }
+.lp-table { font-size: 23px; line-height: 1.35; }
+.lp-table th { font-weight: 400; color: #5A5049; padding: 2px 22px 2px 0; letter-spacing: .12em; }
+.lp-table td { font-weight: 700; padding: 2px 0; }
+.lp-text { font-size: 23px; line-height: 1.6; margin: 10px 6px; word-break: keep-all; }
+.lp-text b { font-weight: 700; }
+.lp-date { font-size: 24px; margin: 14px 0 6px; }
 .lp-issuer { font-family: var(--font-hand); font-size: 26px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 4px; }
 .lp-seal { width: 70px; display: inline-block; transform: rotate(-8deg); margin-left: 6px; }
-.lp-fine { font-size: 11px; color: var(--ink-soft); margin: 14px 0 0; }
+.lp-fine { font-family: var(--font-body); font-size: 11px; color: #5A5049; margin: 14px 0 0; }
 
 /* ── 공개문제 ── */
 .practice { margin-top: 16px; }
@@ -619,6 +621,8 @@ body.in-exam .tabs, body.in-exam .topline { display: none; }
   .result .kv { max-width: none; }
   .lp-frame { padding: 46px 26px 30px; }
   .lp-title { font-size: 42px; }
+  .lp-table, .lp-text { font-size: 19px; }
+  .lp-table th { padding-right: 12px; }
   .kv th { width: 84px; }
   .tk-seal { top: 54px; right: 12px; }
   .field { gap: 4px; padding: 6px; }
