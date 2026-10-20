@@ -358,7 +358,8 @@ input:focus { outline: 3px solid var(--pink); outline-offset: 1px; }
 
 /* ── 감독관 ── */
 .supervisor { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0 16px; }
-.sv-face { flex: none; width: 52px; height: 52px; }
+.sv-face { flex: none; width: 60px; height: 60px; }
+.sv-face .armor { width: 100%; height: 100%; display: block; }
 .sv-bubble {
   position: relative; background: var(--yellow-pale); border: 2px solid var(--ink); border-radius: 16px;
   padding: 8px 14px; flex: 1;

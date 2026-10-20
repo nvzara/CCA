@@ -134,7 +134,7 @@ CN.practical = (function () {
     mount.innerHTML = `
       <section class="page paper">
         <h2 class="h-hand">실기시험 작업 지시서 — ${u.esc(CN.fullName('weed', g))}</h2>
-        ${CN.exam.supervisor('지금부터 실기시험을 시작합니다. 지시서를 잘 읽고, 준비되면 작업장에 들어가세요.')}
+        ${CN.exam.supervisor('지금부터 실기시험을 시작합니다. 지시서를 잘 읽고, 준비되면 작업장에 들어가세요.', 'grass')}
         <table class="kv">
           <tr><th>작업 구역</th><td>${cfg.size} × ${cfg.size} 칸 풀밭 (${u.esc(CN.certs.weed.gradeInfo[g].area)})</td></tr>
           <tr><th>작업 시간</th><td>${sec}초</td></tr>
@@ -326,7 +326,7 @@ CN.practical = (function () {
       b.onclick = () => { tool = b.dataset.t; u.qsa('.tool', mount).forEach((x) => x.classList.toggle('on', x === b)); };
     });
     field.onclick = (e) => { const b = e.target.closest('.cell'); if (b) act(+b.dataset.i); };
-    u.qs('#end', mount).onclick = () => CN.ui.confirm({ title: '작업 완료 신고', body: CN.exam.supervisor('작업을 마치고 채점을 받을까요? 남은 시간은 쓸 수 없습니다.'), ok: '완료 신고', cancel: '계속 작업' }, () => end());
+    u.qs('#end', mount).onclick = () => CN.ui.confirm({ title: '작업 완료 신고', body: CN.exam.supervisor('작업을 마치고 채점을 받을까요? 남은 시간은 쓸 수 없습니다.', 'grass'), ok: '완료 신고', cancel: '계속 작업' }, () => end());
     draw();
     timers.push(setInterval(second, 1000));
   }
@@ -361,7 +361,7 @@ CN.practical = (function () {
     mount.innerHTML = `
       <section class="page paper">
         <h2 class="h-hand">실기시험 작업 지시서 — 슈퍼 알바이터</h2>
-        ${CN.exam.supervisor('라멘 로우 주방입니다. 손님 8명을 응대합니다. 매뉴얼은 시험 전까지만 볼 수 있어요.')}
+        ${CN.exam.supervisor('라멘 로우 주방입니다. 손님 8명을 응대합니다. 매뉴얼은 시험 전까지만 볼 수 있어요.', 'ramen')}
         <table class="kv">
           <tr><th>작업 내용</th><td>손님 8명의 식권 확인 → 면 삶기 → "닌니쿠 이레마스카?" 질문 → 콜 듣기 → 토핑 담아 제공</td></tr>
           <tr><th>작업 시간</th><td>${sec}초 (남은 손님은 0점)</td></tr>

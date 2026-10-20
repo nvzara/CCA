@@ -56,11 +56,34 @@ CN.exam = (function () {
     CN.store.saveApp(app);
   }
 
-  function supervisor(msg) {
-    return `<div class="supervisor"><div class="sv-face">${armorSVG()}</div><div class="sv-bubble">${msg}</div></div>`;
+  function supervisor(msg, kind) {
+    return `<div class="supervisor"><div class="sv-face">${armorSVG(kind)}</div><div class="sv-bubble">${msg}</div></div>`;
   }
-  function armorSVG() {
-    return '<svg viewBox="0 0 60 60" class="armor"><path d="M14 52 V26 Q14 8 30 8 Q46 8 46 26 V52Z" fill="#C9B27C" stroke="#4B3A30" stroke-width="2.4" stroke-linejoin="round"/><rect x="18" y="24" width="24" height="8" rx="3" fill="#4B3A30"/><path d="M30 8 V4" stroke="#4B3A30" stroke-width="2.4"/><circle cx="30" cy="4" r="2.5" fill="#E86F7F" stroke="#4B3A30" stroke-width="1.6"/><path d="M22 40 H38 M22 46 H38" stroke="#4B3A30" stroke-width="2" stroke-linecap="round"/></svg>';
+  /* 갑옷씨 상반신: 둥근 투구, 검은 눈구멍, 이빨 같은 격자 입가리개, 둥근 어깨 갑옷 */
+  const ARMOR = {
+    gray: { body: '#C4C4C6', shade: '#A9A9AD' },
+    grass: { body: '#EFA65A', shade: '#D98A3E', band: 'bandana' },
+    ramen: { body: '#D6C95C', shade: '#BCAE45', band: 'towel' },
+  };
+  function armorSVG(kind) {
+    const k = ARMOR[kind] || ARMOR.gray;
+    const ink = '#262626';
+    const st = `stroke="${ink}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"`;
+    let band = '';
+    if (k.band === 'towel') band = `<path d="M15.5 21 C15 9 22 5 30 5 C38 5 45 9 44.5 21 C38 17 22 17 15.5 21 Z" fill="#fff" ${st}/><path d="M17 20 C24 16.5 36 16.5 43 20" fill="none" stroke="${ink}" stroke-width="1.2" opacity=".5"/>`;
+    if (k.band === 'bandana') band = `<path d="M15.5 19 C16 12 22 8.5 30 8.5 C38 8.5 44 12 44.5 19 C38 16 22 16 15.5 19 Z" fill="#7FB6E0" ${st}/><circle cx="24" cy="13" r="1.3" fill="#FFE07A"/><circle cx="32" cy="12" r="1.3" fill="#F7A1B4"/><circle cx="38" cy="15" r="1.3" fill="#fff"/><path d="M44 17 L50 15 L48 20 Z" fill="#7FB6E0" ${st}/>`;
+    return `<svg viewBox="0 0 60 60" class="armor" aria-hidden="true">
+      <path d="M4 60 C4 50 9 44 17 43 C20 47 40 47 43 43 C51 44 56 50 56 60 Z" fill="${k.body}" ${st}/>
+      <path d="M5 54 C7 48 12 45 18 45 M55 54 C53 48 48 45 42 45" fill="none" stroke="${ink}" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M22 41 H38 L37 47 H23 Z" fill="${k.shade}" ${st}/>
+      <path d="M16 40 C14 30 14.5 8 30 8 C45.5 8 46 30 44 40 C40 43 20 43 16 40 Z" fill="${k.body}" ${st}/>
+      <path d="M30 8.5 V17" stroke="${ink}" stroke-width="1.4" opacity=".55"/>
+      <path d="M17 23 C24 20.5 36 20.5 43 23 L42.6 28.5 C36 26.6 24 26.6 17.4 28.5 Z" fill="${ink}"/>
+      <rect x="22.5" y="30" width="15" height="8" rx="2" fill="#fff" ${st}/>
+      <path d="M26.2 30.5 V37.5 M30 30.5 V37.5 M33.8 30.5 V37.5 M23 34 H37" stroke="${ink}" stroke-width="1.3"/>
+      <circle cx="18.5" cy="33" r="1" fill="${ink}"/><circle cx="41.5" cy="33" r="1" fill="${ink}"/>
+      ${band}
+    </svg>`;
   }
 
   function clockSVG(remain, total) {
