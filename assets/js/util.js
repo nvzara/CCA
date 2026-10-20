@@ -99,7 +99,7 @@ CN.defaultAvatar = { body: 'white', ears: 'round', face: 'normal', pattern: 'non
 CN.avatarInk = '#262626';
 
 /* 증명사진 캐릭터의 SVG 내부 요소 (viewBox 0 0 120 120) */
-CN.avatarInner = function (av) {
+CN.avatarInner = function (av, opt) {
   av = Object.assign({}, CN.defaultAvatar, av || {});
   const P = CN.avatarParts;
   const fill = (P.body.find((b) => b.id === av.body) || P.body[0]).fill;
@@ -162,7 +162,7 @@ CN.avatarInner = function (av) {
   }
   /* 앞발 */
   const paws = `<path d="M40 117 C36 111 38 105 44 105 C48 105 49 109 47 112" fill="${fill}" ${line}/><path d="M80 117 C84 111 82 105 76 105 C72 105 71 109 73 112" fill="${fill}" ${line}/>`;
-  return `${ears}<path d="${head}" fill="${fill}" ${line}/>${hoodPath}${blush(28)}${blush(92)}${face}${paws}`;
+  return `${ears}<path d="${head}" fill="${fill}" ${line}/>${hoodPath}${blush(28)}${blush(92)}${face}${opt && opt.noPaws ? '' : paws}`;
 };
 
 CN.avatarSVG = function (av, opt) {
